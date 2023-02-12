@@ -4,7 +4,7 @@ This project is my capstone project for my python honors class.
 It is not intended for use as financial advice, but feel free to download it for personal use or learning.
 
 ## What It Does
-This app will use python and sqlite (which is included with Python 2.5 and newer), to pull data from the Yahoo! Finance website, parse it, and put it into a database. It only pulls data from the past year, but the code can be altered for more data (further back) if you want it. The program includes failsafes for inputs from the user and many options for accessing the data, which can be built on for a more useful program, or even application if you want. 
+This app will use python and sqlite (which is included with Python 2.5 and newer), to pull data from the Yahoo! Finance website, parse it, and put it into a database. It only pulls data from the past year, but the code can be altered for more data (further back) if you want it. The program then will then allow you to pull data from the database in a "bulk" format or an "inq" format (meaning inquiry). The program includes failsafes for inputs from the user and some lines to make it a bit neater. The program can be halted or quit by typing 'done' and hitting enter at any point.
 
 ### No Requirements needed
 
@@ -25,9 +25,9 @@ If that doesn't work:
 
 And as a last resort try:
 
-<img width="162" alt="Screen Shot 2023-02-12 at 1 16 47 PM" src="https://user-images.githubusercontent.com/123999256/218337702-63632d41-91ad-4ee1-954f-3c62da0c7b32.png
+<img width="162" alt="Screen Shot 2023-02-12 at 1 16 47 PM" src="https://user-images.githubusercontent.com/123999256/218337702-63632d41-91ad-4ee1-954f-3c62da0c7b32.png">
 
-#Make the program work
+# Make the program work
 To make the program work, just type this in the terminal:
 
 python3 StockPull.py
