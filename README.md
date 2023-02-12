@@ -25,7 +25,7 @@ If that doesn't work:
 
 And as a last resort try:
 
-<img width="162" alt="Screen Shot 2023-02-12 at 1 16 47 PM" src="https://user-images.githubusercontent.com/123999256/218337702-63632d41-91ad-4ee1-954f-3c62da0c7b32.png">
+<img width="144" alt="Screen Shot 2023-02-12 at 1 38 42 PM" src="https://user-images.githubusercontent.com/123999256/218338707-230c39b8-d441-49ad-93d7-769684f0c2f0.png">
 
 # Make the program work
 To make the program work, just type this in the terminal:
