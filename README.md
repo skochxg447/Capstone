@@ -14,7 +14,7 @@ This app will use python and sqlite (which is included with Python 2.5 and newer
 
 * But most computers come with python 2.7 installed, which is good enough for this program.
 
-* Try using this command in your terminal if you dont have python:
+Try using this command in your terminal if you dont have python:
 
 <img width="163" alt="Screen Shot 2023-02-12 at 1 19 12 PM" src="https://user-images.githubusercontent.com/123999256/218337823-d1eda334-b6d9-441a-b298-17e4154c7713.png">
 
