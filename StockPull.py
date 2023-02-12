@@ -86,99 +86,75 @@ def pull(ticker):
 
 # -------------------------------------------------------------------------------------
 #Data Manipulation (AKA -inquire)
-def color(symbol):    
-
-    cur.execute(f'''SELECT id,Open,Close FROM {symbol}''')
+def color(symbol):
+    cur.execute(f'SELECT Open, Close FROM {symbol} ORDER BY id DESC LIMIT 250')
     opnclo = cur.fetchall()
-    slist = sorted(opnclo, reverse=True)
+    difflst = [round(x[0]-x[1], 5) for x in opnclo]
     
-    difflst = []
-    id_num = 0
-    posit = 0
-    while id_num >= 0 and posit < 250:
-        id_num = slist[0][0]
-        diff = round(slist[posit][1] - slist[posit][2], 5)
-        difflst.append(diff)
-        id_num = id_num - 1
-        posit = posit + 1
- 
-    val = 0
-    poscount = 0
-    negcount = 0
-    for diff in difflst:
-        perc = (diff/slist[val][1]) * 100
-        val = val + 1
-        # print('percentage change:', round(perc, 2))
-        if perc >= 0:
-            poscount = poscount + 1
-
-        elif perc <= 0:
-            negcount = negcount + 1
-        else: continue
-    if (poscount/250) > (negcount/250):
-        print('GREEN', poscount/2.50, '%', 'chance')
+    poscount = sum(1 for diff in difflst if (diff / opnclo[0][0]) * 100 >= 0)
+    negcount = 250 - poscount
+    
+    if poscount > negcount:
+        print('GREEN', round(poscount / 2.50, 2), '%', 'chance')
     else:
-        print('RED', negcount/2.50, '%', 'chance')
+        print('RED', round(negcount / 2.50, 2), '%', 'chance')
+
     # print('positive changes:', poscount, '\nnegative changes:', negcount)
 
 #Algorithm needs improvement, currently based on how many red or green days for the year
 # -------------------------------------------------------------------------------------
 
 def inquire(ticker):
-    from datetime import date
     from datetime import datetime
 
-    x = True
-
-    while x == True:
-
-        request = input('\t Inquire Data:\n'
-        '\t  -date (all data on specific date)\n'
-        '\t  -max (highest price in data)\n'
-        '\t  -min (lowest price in data)\n'
-        '\t  -color (what does the database predict tomorrow? +/-)\n'
-        '\t  -done (finish program)\n'
-        '-')
+    while True:
+        request = input('''Inquire Data:
+            - date (all data on specific date)
+            - max (highest price in data)
+            - min (lowest price in data)
+            - color (what does the database predict tomorrow? +/-)
+            - done (finish program)
+            - ''')
 
         if request.lower() == 'done':
             fin()
         elif request.lower() == 'date':
-            t = True
-            while t == True:
-                ymd = (input('Input valid market date from past year in format \"YYYY-MM-DD\": '))
+            while True:
+                ymd = input('Input valid market date from past year in format "YYYY-MM-DD": ')
                 if ymd.lower() == 'done':
                     fin()
                 try:
-                    ymd = datetime.strptime(ymd, "%Y-%m-%d")
-                    x = str(ymd)
-                    ymd = x[:10]
-                    
-                except:
+                    ymd = datetime.strptime(ymd, "%Y-%m-%d").strftime("%Y-%m-%d")
+                except ValueError:
                     print('Error: must be in YYYY-MM-DD')
-                    # nwl()
                     continue
 
-                try: 
-                    cur.execute(f'''SELECT * FROM {ticker} Where Date = \'{ymd}\'''')
+                try:
+                    cur.execute(f"SELECT * FROM {ticker} WHERE Date = '{ymd}'")
                     date = cur.fetchone()
-                    print('Stock:', date[1], "\n" 'Date:', date[2], "\n" 'Open:', date[3], "\n"  'High:', date[4], "\n"  'Low:', date[5], "\n"  'Close:', date[6], "\n"  'Adjusted Price:', date[7], "\n"  'Volume:', date[8])
-                    t = False
+                    print(f'''Stock: {date[1]}
+                    Date: {date[2]}
+                    Open: {date[3]}
+                    High: {date[4]}
+                    Low: {date[5]}
+                    Close: {date[6]}
+                    Adjusted Price: {date[7]}
+                    Volume: {date[8]}''')
+                    break
                 except:
-                    print('Date out of range.',
-                    'Please try again.')
-
+                    print('Date out of range. Please try again.')
             break
 
         elif request.lower() == 'max':
-            cur.execute(f'''SELECT Date,max(High) FROM {ticker}''')
+            cur.execute(f"SELECT Date, MAX(High) FROM {ticker}")
             pricemax = cur.fetchone()
-            print(pricemax[0]+",", pricemax[1])
+            print(pricemax[0], pricemax[1])
             break
 
         elif request.lower() == 'min':
-            cur.execute(f'''SELECT Date,max(Low) FROM {ticker}''')
+            cur.execute(f"SELECT Date, MIN(Low) FROM {ticker}")
             pricemax = cur.fetchone()
-            print(pricemax[0]+",", pricemax[1])
+            print(pricemax[0], pricemax[1])
             break
 
         elif request.lower() == 'color':
@@ -186,113 +162,92 @@ def inquire(ticker):
             break
 
         else:
-            print('>>>Please input valid entry<<<')
+            print('Please input a valid entry.')
             continue
+
 # -------------------------------------------------------------------------------------
 #Presenting bulk data from Database
-
 def bulk(ticker):
-    
-    x = True 
-
-    while x == True:
-
+    while True:
         request = input('\tBulk Data:\n'
-        '\t  -highs (all of the highs for the last year)\n'
-        '\t  -lows (all of the lows for the last year)\n'
-        '\t  -opens (all of the opening prices for the last year)\n'
-        '\t  -closes (all of the closing prices for the last year)\n'
-        f'\t  -all (all of the data on {ticker})\n'
-        '\t  -done (finish program)\n'
-        '-')
-        
+                        '\t  -highs (all of the highs for the last year)\n'
+                        '\t  -lows (all of the lows for the last year)\n'
+                        '\t  -opens (all of the opening prices for the last year)\n'
+                        '\t  -closes (all of the closing prices for the last year)\n'
+                        f'\t  -all (all of the data on {ticker})\n'
+                        '\t  -done (finish program)\n'
+                        '-')
+
         if request.lower() == 'done':
             fin()
 
         elif request.lower() == 'highs':
-            cur.execute(f'''SELECT Date,High FROM {ticker}''')
-            pricehighs = cur.fetchall()
-            for line in pricehighs:
-                print(line[0]+",", line[1])
+            fetch_and_print_all(cur, f'SELECT Date, High FROM {ticker}')
             break
 
         elif request.lower() == 'lows':
-            cur.execute(f'''SELECT Date,Low FROM {ticker}''')
-            pricelows = cur.fetchall()
-            for line in pricelows:
-                print(line[0]+",", line[1])
+            fetch_and_print_all(cur, f'SELECT Date, Low FROM {ticker}')
             break
 
         elif request.lower() == 'opens':
-            cur.execute(f'''SELECT Date,Open FROM {ticker}''')
-            priceopens = cur.fetchall()
-            for line in priceopens:
-                print(line[0]+",", line[1])
+            fetch_and_print_all(cur, f'SELECT Date, Open FROM {ticker}')
             break
 
         elif request.lower() == 'closes':
-            cur.execute(f'''SELECT Date,Close FROM {ticker}''')
-            pricecloses = cur.fetchall()
-            for line in pricecloses:
-                print(line[0]+",", line[1])
+            fetch_and_print_all(cur, f'SELECT Date, Close FROM {ticker}')
             break
 
         elif request.lower() == 'all':
-            cur.execute(f'''SELECT * FROM {ticker}''')
-            pricecloses = cur.fetchall()
-            for line in pricecloses:
-                print(line[1]+",", line[2]+",", line[3],
-                line[4], line[5], line[6], line[8])
-            print('Stock, Date, Open, High, Low, Close, Volume')
+            fetch_and_print_all(cur, f'SELECT * FROM {ticker}',
+                                columns='Stock, Date, Open, High, Low, Close, Volume')
             break
 
         else:
             print('>>>Please input valid entry<<<')
-            continue
+
+
+def fetch_and_print_all(cursor, query, columns=None):
+    cursor.execute(query)
+    data = cursor.fetchall()
+    if columns:
+        print(columns)
+    for row in data:
+        print(', '.join(str(cell) for cell in row))
 # -------------------------------------------------------------------------------------
 
 def run():
-    #Program Navigation
-    ticker_valid = True
-    while ticker_valid:
-        
+    while True:
         nwl()
-        ticker = input(
-        'Please input the ticker you would like to know about: ')
+        ticker = input('Please input the ticker you would like to know about: ')
+
+        if not ticker:
+            fin()
 
         if ticker.lower() == 'done':
-            fin()
-        if ticker.lower() == '':
             fin()
 
         if pull(ticker) == 'not_found':
             continue
 
-        else:
-
-            # nwl()
+        while True:
+            nwl()
             print(f'What would you like to do for {ticker}?')
-            while ticker_valid:
-                nav = input(
-                '\tOptions:\n'
-                '\t  -bulk (retrieve bulk data)\n'
-                '\t  -inq (inquire about specifics)\n'
-                '\t  -done (finish program)\n'
-                '-'
-                )
-                if nav.lower() == 'bulk':
-                    bulk(ticker)
-                    break
-                elif nav.lower() == 'inq':
-                    inquire(ticker)
-                    break
-                elif nav.lower() == 'done':
-                    fin()
-                else:
-                    # nwl()
-                    print('>>>Please input valid entry<<<')
-                    continue
+            nav = input('\tOptions:\n\t  -bulk (retrieve bulk data)\n'
+                        '\t  -inq (inquire about specifics)\n'
+                        '\t  -done (finish program)\n-')
 
+            if nav.lower() == 'bulk':
+                bulk(ticker)
+                break
+
+            if nav.lower() == 'inq':
+                inquire(ticker)
+                break
+
+            if nav.lower() == 'done':
+                fin()
+
+            print('>>>Please input valid entry<<<')
 
         # time.sleep(2)
 
