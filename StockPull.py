@@ -27,7 +27,7 @@ def nwl():
 # -------------------------------------------------------------------------------------
 
 def pull(ticker):
-    '''Prompt for Ticker and Scrape for data'''
+    '''Scrape for data'''
 
     # Get today's date
     today = datetime.date.today()
